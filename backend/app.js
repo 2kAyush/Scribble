@@ -17,7 +17,13 @@ io.on("connection", (socket) => {
   console.log(`a user connected with id = ${socket.id}`);
   socket.on("join_room", (name, roomId, avatar) => {
     gameSession = GameSessionService.getGameSession();
-    gameSession.leaderBoard.push([socket.id, name, avatar, 0]);
+    gameSession.leaderBoard.push({
+      id: socket.id,
+      name,
+      avatar,
+      score: 0,
+      host: false,
+    });
   });
 
   socket.on("create_room", (name, avatar) => {

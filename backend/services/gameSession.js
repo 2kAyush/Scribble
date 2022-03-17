@@ -10,7 +10,9 @@ class GameSession {
 
   init(name, id, avatar) {
     if (this.gameSession === null) {
-      this.gameSession = new GameSession("random", [[id, name, avatar, 0]]); // 0 stands for score
+      this.gameSession = new GameSession("random", [
+        { id, name, avatar, score: 0, host: true },
+      ]); // 0 stands for score
     } else return;
   }
   getGameSession() {
