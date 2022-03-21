@@ -1,0 +1,28 @@
+@import "./settings/reset.scss";
+@import "./settings/variables.scss";
+@import url("https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap");
+@import "./layouts/landing.scss";
+@import "./layouts/waiting.scss";
+@import "./components/settings_comp.scss";
+
+* {
+  font-family: "Syne Mono", monospace;
+  box-sizing: border-box;
+}
+body {
+  background-color: $dark-green;
+}
+
+.scribbl_heading {
+  text-align: center;
+  color: $baby-pink;
+}
+
+button {
+  height: 30px;
+  border-radius: 5px;
+}
+
+.start-button {
+  margin: 5px 10px;
+}

@@ -1,0 +1,17 @@
+.waiting-room {
+  text-align: center;
+}
+
+.container-lobby {
+  display: flex;
+  width: 60%;
+  margin: 10px auto;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media screen and (min-width: $mobile-screen) {
+  .container-lobby {
+    flex-direction: row;
+  }
+}

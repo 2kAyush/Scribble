@@ -1,3 +1,5 @@
+const { Server } = require("socket.io"); // to remove
+
 const { instrument } = require("@socket.io/admin-ui");
 const express = require("express");
 const GameSocketService = require("./services/gameSocket");
@@ -7,28 +9,59 @@ const http = require("http");
 const PORT = 4000;
 const app = express();
 const server = http.createServer(app);
-GameSocketService.init(server);
+// GameSocketService.init(server);
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
+// const gameSocket = new GameSocketService();
+// gameSocket.init(server);
+// const io = gameSocket.getInstance();
+const io = new Server(server, {
+  cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://admin.socket.io",
+      "http://127.0.0.1:5500",
+    ],
+  },
 });
 
 io.on("connection", (socket) => {
   console.log(`a user connected with id = ${socket.id}`);
-  socket.on("join_room", (name, roomId, avatar) => {
-    gameSession = GameSessionService.getGameSession();
+  socket.on("create-room", (name, callback) => {
+    console.log(name);
+    callback("random");
+    // GameSessionService.init(name, socket.id, avatar);
+  });
+
+  socket.on("join-room", (name, roomId, callback) => {
+    console.log(name, roomId);
+    callback(`Joined room ${roomId}`);
+    /* gameSession = GameSessionService.getGameSession();
     gameSession.leaderBoard.push({
       id: socket.id,
       name,
       avatar,
       score: 0,
       host: false,
-    });
+    }); */
   });
 
-  socket.on("create_room", (name, avatar) => {
-    GameSessionService.init(name, socket.id, avatar);
+  socket.on("draw/command", (commands) => {
+    // console.log(command, startX, startY, currentX, currentY);
+    // console.log(batch);
+    socket.broadcast.emit("draw/command", commands);
   });
+
+  socket.on("send-message", (message, room) => {
+    if (room === "") {
+      socket.broadcast.emit("receive-message", message);
+    } else {
+      socket.to(room).emit("receive-message", message);
+    }
+  });
+  // socket.on("join-room", (roomId, callback) => {
+  //   socket.join(roomId);
+  //   callback(`${socket.id} joined room: ${roomId}`);
+  // });
 });
 
 server.listen(PORT, () => {

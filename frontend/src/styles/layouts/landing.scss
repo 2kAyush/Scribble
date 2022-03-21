@@ -1,0 +1,36 @@
+.join-box {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.canvas {
+  // width: 90vw;
+  // height: 90vh;
+  margin: 5px auto;
+  background-color: white;
+}
+
+.input-box {
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 1px solid white;
+}
+
+@media screen and (min-width: $mobile-screen) {
+  .join-box {
+    flex-direction: row;
+  }
+  // .canvas {
+  //   width: 40vw;
+  //   height: 100vh;
+  // }
+  .input-box {
+    margin: auto auto;
+  }
+}

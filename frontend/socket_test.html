@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Chat</title>
+    <script
+      src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+      crossorigin="anonymous"
+    ></script>
+    <script src="socket_test.mjs" defer></script>
+  </head>
+  <body>
+    <div id="message-container"></div>
+    <form id="form">
+      <label for="message-input">Message</label>
+      <input type="text" id="message-input" />
+      <button type="submit" id="send-message-button">Send</button>
+
+      <label for="room-input">Room</label>
+      <input type="text" id="room-input" />
+      <button type="submit" id="join-room-button">Join</button>
+    </form>
+  </body>
+</html>
