@@ -5,7 +5,11 @@ class GameSocket {
 
   init(htttpServer) {
     if (this.instance) return;
-    this.instance = new Server(htttpServer);
+    this.instance = new Server(htttpServer, {
+      cors: {
+        origin: ["http://localhost:3000", "https://admin.socket.io"],
+      },
+    });
   }
 
   getInstance() {
@@ -13,4 +17,4 @@ class GameSocket {
   }
 }
 
-module.exports = GameSocket;
+module.exports = new GameSocket();

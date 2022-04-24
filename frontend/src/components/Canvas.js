@@ -10,9 +10,9 @@ export default function Canvas({ socket }) {
     context.fillStyle = defaultStyle;
     contextRef.current = context;
     socket.on("draw/command", (commands) => {
-      console.log(commands);
+      // console.log(commands);
       commands.forEach((batch) => {
-        console.log(batch[0], batch[1], batch[2], batch[3], batch[4]);
+        // console.log(batch[0], batch[1], batch[2], batch[3], batch[4]);
         if (batch[0] === 1) {
           eraseIt(batch[3], batch[4]);
         } else if (batch[0] === 0) {
@@ -21,10 +21,12 @@ export default function Canvas({ socket }) {
             batch[2] = batch[4];
           }
           drawIt(batch[1], batch[2], batch[3], batch[4]);
+        } else {
+          clearCanvas();
         }
       });
     });
-  }, []);
+  });
   const [isDrawing, setIsDrawing] = useState(false);
   const [eraser, setEraser] = useState(false);
   let startX, startY;
@@ -63,23 +65,22 @@ export default function Canvas({ socket }) {
     contextRef.current.lineTo(currentX, currentY);
     contextRef.current.stroke();
   }
-
+  const clearCanvas = () => {
+    contextRef.current.clearRect(
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height
+    );
+  };
   const handleMouseMove = (e) => {
     const currentX = e.nativeEvent.offsetX;
     const currentY = e.nativeEvent.offsetY;
     if (isDrawing) {
       if (eraser) {
-        // contextRef.current.fillStyle = defaultStyle;
-        // contextRef.current.fillRect(currentX, currentY, 20, 20);
         eraseIt(currentX, currentY);
         sendDraw(1, currentX, currentY);
       } else {
-        // contextRef.current.fillstyle = "rgb(0, 0, 0)";
-
-        // contextRef.current.beginPath();
-        // contextRef.current.moveTo(startX, startY);
-        // contextRef.current.lineTo(currentX, currentY);
-        // contextRef.current.stroke();
         drawIt(startX, startY, currentX, currentY);
         sendDraw(0, currentX, currentY);
         // when calling like this startX, startY gets null in the first call so make sure to handle that case
@@ -97,13 +98,9 @@ export default function Canvas({ socket }) {
   const selectPen = () => {
     setEraser(false);
   };
-  const clearCanvas = () => {
-    contextRef.current.clearRect(
-      0,
-      0,
-      canvasRef.current.width,
-      canvasRef.current.height
-    );
+  const handleClear = () => {
+    clearCanvas();
+    sendDraw(-1, -1, -1);
     setEraser(false);
   };
 
@@ -126,7 +123,7 @@ export default function Canvas({ socket }) {
           <button id="eraser" onClick={toggleEraser}>
             eraser
           </button>
-          <button id="clear" onClick={clearCanvas}>
+          <button id="clear" onClick={handleClear}>
             clear
           </button>
         </div>

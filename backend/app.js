@@ -1,32 +1,63 @@
-const { Server } = require("socket.io"); // to remove
-
 const { instrument } = require("@socket.io/admin-ui");
 const express = require("express");
-const GameSocketService = require("./services/gameSocket");
-const GameSessionService = require("./services/gameSession");
 const http = require("http");
+const gameSocket = require("./services/gameSocket");
+// const GameSessionService = require("./services/game_session_service");
+const Player = require("./models/player");
 
+// all handlers
+const { draw } = require("./handlers/canvasHandler");
+const {
+  joinRoom,
+  createRoom,
+  chatAndGuess,
+} = require("./handlers/roomHandler");
+
+// server creation
 const PORT = 4000;
 const app = express();
 const server = http.createServer(app);
-// GameSocketService.init(server);
-
-// const gameSocket = new GameSocketService();
-// gameSocket.init(server);
-// const io = gameSocket.getInstance();
-const io = new Server(server, {
-  cors: {
-    origin: [
-      "http://localhost:3000",
-      "https://admin.socket.io",
-      "http://127.0.0.1:5500",
-    ],
-  },
-});
+gameSocket.init(server);
+const io = gameSocket.getInstance();
 
 io.on("connection", (socket) => {
-  console.log(`a user connected with id = ${socket.id}`);
-  socket.on("create-room", (name, callback) => {
+  // console.log(`a user connected with id = ${socket.id}`);
+  const player = new Player(socket);
+  console.log("new player with id =", player.playerId);
+  socket.on("session/create", (name, settings, callback) => {
+    console.log(name, settings);
+    player.setName(name);
+    const createdRoom = createRoom(player, settings);
+    callback(player.playerId, createdRoom);
+  });
+
+  socket.on("session/join", (name, sessionId, callback) => {
+    player.setName(name);
+    // console.log("this is the player: ", player);
+    // joinRoom(player, sessionId); // this will only work if the room is created
+    socket.join(sessionId);
+    callback(`joined Room`);
+  });
+
+  socket.on("draw/command", (commands) => {
+    draw(socket, commands, socket);
+  });
+
+  socket.on("session/chat", (room, message) => {
+    // chatAndGuess(player, message, socket);
+    // console.log(room, message);
+    socket.broadcast.emit("session/chat", room, message);
+    // socket.to(room).emit("session/chat", room, message);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`listening on *:${PORT}`);
+});
+
+/* 
+inside the io.on("connection") :
+socket.on("create-room", (name, callback) => {
     console.log(name);
     callback("random");
     // GameSessionService.init(name, socket.id, avatar);
@@ -35,63 +66,15 @@ io.on("connection", (socket) => {
   socket.on("join-room", (name, roomId, callback) => {
     console.log(name, roomId);
     callback(`Joined room ${roomId}`);
-    /* gameSession = GameSessionService.getGameSession();
+    gameSession = GameSessionService.getGameSession();
     gameSession.leaderBoard.push({
       id: socket.id,
       name,
       avatar,
       score: 0,
       host: false,
-    }); */
+    });
   });
-
-  socket.on("draw/command", (commands) => {
-    // console.log(command, startX, startY, currentX, currentY);
-    // console.log(batch);
-    socket.broadcast.emit("draw/command", commands);
-  });
-
-  socket.on("send-message", (message, room) => {
-    if (room === "") {
-      socket.broadcast.emit("receive-message", message);
-    } else {
-      socket.to(room).emit("receive-message", message);
-    }
-  });
-  // socket.on("join-room", (roomId, callback) => {
-  //   socket.join(roomId);
-  //   callback(`${socket.id} joined room: ${roomId}`);
-  // });
-});
-
-server.listen(PORT, () => {
-  console.log(`listening on *:${PORT}`);
-});
-
-/* 
-const io = require("socket.io")(PORT, {
-  cors: {
-    origin: ["http://localhost:3000", "https://admin.socket.io"],
-  },
-});
-
-io.on("connection", (socket) => {
-  console.log(socket.id);
-  socket.on("click", (data, obj) => {
-    console.log("clicked with id =", socket.id);
-    console.log(data, obj);
-  });
-
-  socket.on("create-room", (name, response) => {
-    console.log(name, "; id:-> ", socket.id);
-    response("random");
-  });
-  socket.on("join-room", (name, room, callback) => {
-    // console.log(name, "; id:-> ", socket.id);
-    socket.join(room);
-    callback(`joined ${room} with id=${socket.id}`);
-  });
-});
  */
 instrument(io, {
   auth: false,

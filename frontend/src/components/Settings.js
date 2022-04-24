@@ -8,7 +8,7 @@ export default function Settings() {
   const [totalRounds, setTotalRounds] = useState("1");
   const [roundTime, setRoundTime] = useState("60");
   const [language, setLanguage] = useState("English");
-
+  // send to the backend in the form of [times, rounds] format
   return (
     <>
       <div className="settings-container">
